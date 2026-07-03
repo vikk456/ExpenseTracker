@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ExpenseTracker — My Receipts</title>
+  <meta name="description" content="View all your past receipts, spending analytics, and AI-extracted expense details." />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* ── Page layout ── */
+    .profile-page {
+      min-height: 100vh;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── Top Bar ── */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 36px;
+      border-bottom: 1px solid var(--glass-border);
+      background: rgba(10,10,20,0.6);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .topbar-left { display: flex; align-items: center; gap: 20px; }
+
+    .back-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 8px 14px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--glass-border);
+      transition: all var(--transition-base);
+    }
+
+    .back-btn:hover {
+      color: var(--text-primary);
+      border-color: var(--glass-border-hover);
+      background: var(--bg-card-hover);
+    }
+
+    .topbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+    }
+
+    .topbar-brand-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--gradient-primary);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .topbar-right { display: flex; align-items: center; gap: 14px; }
+
+    /* ── Avatar / dropdown (same as app.html) ── */
+    .profile-menu { position: relative; }
+    .avatar-btn {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: var(--gradient-primary); border: 2px solid rgba(139,92,246,0.4);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      font-size: 15px; font-weight: 700; color: #fff; transition: all var(--transition-base);
+      font-family: var(--font);
+    }
+    .avatar-btn:hover { border-color: var(--accent-primary); box-shadow: 0 0 0 3px rgba(139,92,246,0.2); }
+
+    .dropdown {
+      position: absolute; top: calc(100% + 10px); right: 0; width: 190px;
+      background: rgba(15,15,28,0.95); border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md); backdrop-filter: blur(20px);
+      box-shadow: var(--shadow-lg); overflow: hidden; opacity: 0;
+      transform: translateY(-6px) scale(0.97); pointer-events: none;
+      transition: all var(--transition-base); z-index: 100;
+    }
+    .dropdown.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: all; }
+    .dropdown-header { padding: 14px 16px 10px; border-bottom: 1px solid var(--glass-border); }
+    .dropdown-username { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+    .dropdown-email { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .dropdown-item {
+      display: flex; align-items: center; gap: 10px; padding: 10px 16px; cursor: pointer;
+      font-size: 14px; color: var(--text-secondary); transition: all var(--transition-fast);
+      border: none; background: none; width: 100%; font-family: var(--font); text-decoration: none;
+    }
+    .dropdown-item:hover { background: var(--bg-card-hover); color: var(--text-primary); }
+    .dropdown-item.danger { color: #f87171; }
+    .dropdown-item.danger:hover { background: rgba(239,68,68,0.1); }
+
+    /* ── Page content ── */
+    .page-content { padding: 36px; max-width: 1400px; margin: 0 auto; }
+
+    /* ── Page header ── */
+    .page-header { margin-bottom: 32px; }
+    .page-title { font-size: 30px; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 6px; }
+    .page-subtitle { font-size: 14px; color: var(--text-secondary); }
+
+    /* ── Analytics Strip ── */
+    .analytics-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 36px;
+    }
+
+    .stat-card {
+      padding: 22px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .stat-icon {
+      font-size: 24px;
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--text-primary);
+    }
+
+    .stat-value.gradient { background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .stat-value.cyan { color: var(--accent-cyan); }
+    .stat-value.emerald { color: var(--accent-emerald); }
+    .stat-value.amber { color: var(--accent-amber); }
+
+    .stat-sub { font-size: 12px; color: var(--text-muted); }
+
+    /* ── Section separator ── */
+    .section-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-count {
+      background: rgba(139,92,246,0.15);
+      color: var(--accent-secondary);
+      padding: 2px 10px;
+      border-radius: var(--radius-full);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    /* ── Expense Grid ── */
+    .expense-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 18px;
+    }
+
+    /* ── Expense Card ── */
+    .expense-card {
+      padding: 22px;
+      cursor: pointer;
+      transition: all var(--transition-base);
+    }
+
+    .expense-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(139,92,246,0.35);
+      box-shadow: 0 8px 32px rgba(139,92,246,0.15);
+    }
+
+    .ec-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 14px;
+    }
+
+    .ec-vendor {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+    }
+
+    .ec-total {
+      font-size: 18px;
+      font-weight: 800;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .ec-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+
+    .ec-date { font-size: 12px; color: var(--text-muted); }
+
+    .ec-expand-hint {
+      font-size: 11px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: color var(--transition-fast);
+    }
+
+    .expense-card:hover .ec-expand-hint { color: var(--accent-secondary); }
+
+    /* ── Expanded Card / Modal ── */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--transition-base);
+    }
+
+    .modal-backdrop.open { opacity: 1; pointer-events: all; }
+
+    .modal {
+      background: rgba(15,15,28,0.98);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-xl);
+      padding: 32px;
+      width: 100%;
+      max-width: 800px;
+      max-height: 90vh;
+      overflow-y: auto;
+      transform: scale(0.95) translateY(10px);
+      transition: transform var(--transition-slow);
+      box-shadow: var(--shadow-lg), var(--shadow-glow);
+    }
+
+    .modal-backdrop.open .modal { transform: scale(1) translateY(0); }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 24px;
+    }
+
+    .modal-vendor { font-size: 24px; font-weight: 800; letter-spacing: -0.03em; }
+    .modal-total { font-size: 30px; font-weight: 800; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+    .modal-close {
+      width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.06);
+      border: 1px solid var(--glass-border); cursor: pointer; display: flex;
+      align-items: center; justify-content: center; font-size: 18px; color: var(--text-secondary);
+      transition: all var(--transition-fast);
+    }
+
+    .modal-close:hover { background: rgba(239,68,68,0.15); color: #f87171; border-color: rgba(239,68,68,0.3); }
+
+    .modal-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .modal-details { display: flex; flex-direction: column; gap: 12px; }
+
+    .modal-meta-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 0; border-bottom: 1px solid var(--glass-border); font-size: 14px;
+    }
+    .modal-meta-row:last-child { border-bottom: none; }
+    .modal-meta-label { color: var(--text-muted); }
+    .modal-meta-value { color: var(--text-primary); font-weight: 600; }
+
+    .modal-summary-label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; margin-top: 16px; }
+    .modal-summary-text { font-size: 14px; color: var(--text-secondary); line-height: 1.7; font-style: italic; }
+
+    .modal-receipt-section { display: flex; flex-direction: column; }
+    .modal-receipt-label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 12px; }
+    .modal-receipt-img { width: 100%; border-radius: var(--radius-md); object-fit: contain; max-height: 450px; border: 1px solid var(--glass-border); }
+    .no-receipt { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 200px; gap: 10px; color: var(--text-muted); font-size: 14px; }
+
+    /* ── Loading / Empty states ── */
+    .loading-state {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 16px; padding: 80px 20px; text-align: center; color: var(--text-secondary);
+    }
+
+    .empty-state {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 14px; padding: 80px 20px; text-align: center;
+    }
+
+    .empty-icon { font-size: 64px; opacity: 0.3; }
+    .empty-title { font-size: 20px; font-weight: 700; color: var(--text-secondary); }
+    .empty-sub { font-size: 14px; color: var(--text-muted); max-width: 300px; }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .page-content { padding: 20px; }
+      .topbar { padding: 12px 20px; }
+      .modal-body { grid-template-columns: 1fr; }
+      .expense-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Background Orbs -->
+  <div class="bg-orbs" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast-container" role="alert" aria-live="polite"></div>
+
+  <!-- Expand Modal -->
+  <div class="modal-backdrop" id="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modal-vendor" aria-hidden="true">
+    <div class="modal glass-card" id="modal">
+      <div class="modal-header">
+        <div>
+          <p class="modal-vendor" id="modal-vendor">—</p>
+          <div id="modal-category-badge" style="margin-top: 8px;"></div>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 10px;">
+          <p class="modal-total" id="modal-total">$0.00</p>
+          <button class="modal-close" id="modal-close" aria-label="Close modal">✕</button>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <!-- Details -->
+        <div class="modal-details">
+          <div class="modal-meta-row">
+            <span class="modal-meta-label">📅 Date</span>
+            <span class="modal-meta-value" id="modal-date">—</span>
+          </div>
+          <div class="modal-meta-row">
+            <span class="modal-meta-label">🧾 Subtotal</span>
+            <span class="modal-meta-value" id="modal-subtotal">—</span>
+          </div>
+          <div class="modal-meta-row">
+            <span class="modal-meta-label">💸 Tax</span>
+            <span class="modal-meta-value" id="modal-tax">—</span>
+          </div>
+          <div class="modal-meta-row">
+            <span class="modal-meta-label">💰 Total</span>
+            <span class="modal-meta-value" id="modal-total-2" style="color: var(--accent-secondary); font-size: 16px;">—</span>
+          </div>
+
+          <div>
+            <p class="modal-summary-label">AI Summary</p>
+            <p class="modal-summary-text" id="modal-summary">—</p>
+          </div>
+        </div>
+
+        <!-- Receipt image -->
+        <div class="modal-receipt-section">
+          <p class="modal-receipt-label">📸 Receipt</p>
+          <img id="modal-receipt-img" class="modal-receipt-img hidden" alt="Receipt image" />
+          <div id="modal-no-receipt" class="no-receipt">
+            <span style="font-size: 48px; opacity: 0.3;">🧾</span>
+            <span>No receipt image available</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="profile-page">
+    <!-- Top Bar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <a href="app.html" class="back-btn" aria-label="Back to dashboard">
+          ← Dashboard
+        </a>
+        <div class="topbar-brand">
+          <div class="topbar-brand-icon" aria-hidden="true">💸</div>
+          <span>ExpenseTracker</span>
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <div class="profile-menu" id="profile-menu">
+          <button class="avatar-btn" id="avatar-btn" aria-label="Profile menu" aria-expanded="false" aria-haspopup="true">
+            <span id="avatar-initials">?</span>
+          </button>
+          <div class="dropdown" id="dropdown" role="menu">
+            <div class="dropdown-header">
+              <div class="dropdown-username" id="dd-username">—</div>
+              <div class="dropdown-email" id="dd-email"></div>
+            </div>
+            <a href="app.html" class="dropdown-item" role="menuitem">
+              <span aria-hidden="true">🏠</span> Dashboard
+            </a>
+            <button class="dropdown-item danger" id="logout-btn" role="menuitem">
+              <span aria-hidden="true">🚪</span> Logout
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Page Content -->
+    <main class="page-content">
+      <header class="page-header">
+        <h1 class="page-title">My <span class="text-gradient">Receipts</span></h1>
+        <p class="page-subtitle">All your uploaded receipts with AI-extracted data</p>
+      </header>
+
+      <!-- Analytics Strip -->
+      <section aria-label="Spending analytics">
+        <div class="analytics-strip" id="analytics-strip">
+          <div class="glass-card stat-card">
+            <span class="stat-icon">💰</span>
+            <span class="stat-label">Total Spent</span>
+            <span class="stat-value gradient" id="stat-total">—</span>
+            <span class="stat-sub">Across all receipts</span>
+          </div>
+          <div class="glass-card stat-card">
+            <span class="stat-icon">🧾</span>
+            <span class="stat-label">Receipts</span>
+            <span class="stat-value cyan" id="stat-count">—</span>
+            <span class="stat-sub">Total uploaded</span>
+          </div>
+          <div class="glass-card stat-card">
+            <span class="stat-icon">🏆</span>
+            <span class="stat-label">Top Category</span>
+            <span class="stat-value emerald" id="stat-top-cat" style="font-size: 20px;">—</span>
+            <span class="stat-sub">By total spend</span>
+          </div>
+          <div class="glass-card stat-card">
+            <span class="stat-icon">📊</span>
+            <span class="stat-label">Avg per Receipt</span>
+            <span class="stat-value amber" id="stat-avg">—</span>
+            <span class="stat-sub">Average spend</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Receipts Grid -->
+      <section aria-label="Receipt history">
+        <div class="section-title">
+          <span>Receipt History</span>
+          <span class="section-count" id="count-label">0</span>
+        </div>
+
+        <!-- Loading -->
+        <div id="loading-state" class="loading-state" role="status" aria-live="polite">
+          <div class="spinner" style="width: 36px; height: 36px; border-width: 3px;" aria-hidden="true"></div>
+          <p>Loading your receipts…</p>
+        </div>
+
+        <!-- Empty -->
+        <div id="empty-state" class="empty-state hidden">
+          <span class="empty-icon" aria-hidden="true">🧾</span>
+          <p class="empty-title">No receipts yet</p>
+          <p class="empty-sub">Upload your first receipt to start tracking your expenses with AI</p>
+          <a href="app.html" class="btn btn-primary" style="margin-top: 8px;">Upload a Receipt</a>
+        </div>
+
+        <!-- Grid -->
+        <div class="expense-grid hidden" id="expense-grid" role="list" aria-label="Expense receipts"></div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const API = 'http://localhost:8000';
+    const token = localStorage.getItem('access_token');
+    const username = localStorage.getItem('username') || 'User';
+    const email = localStorage.getItem('email') || '';
+
+    /* ── Auth Guard ── */
+    if (!token) window.location.href = 'index.html';
+
+    /* ── User info ── */
+    document.getElementById('avatar-initials').textContent = username.charAt(0).toUpperCase();
+    document.getElementById('dd-username').textContent = username;
+    document.getElementById('dd-email').textContent = email;
+
+    /* ── Toast ── */
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      toast.innerHTML = `<span class="toast-icon">${icons[type]}</span><span class="toast-message">${message}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.classList.add('toast-out');
+        toast.addEventListener('animationend', () => toast.remove(), { once: true });
+      }, 3500);
+    }
+
+    /* ── Profile dropdown ── */
+    const avatarBtn = document.getElementById('avatar-btn');
+    const dropdown = document.getElementById('dropdown');
+
+    avatarBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = dropdown.classList.toggle('open');
+      avatarBtn.setAttribute('aria-expanded', isOpen);
+    });
+
+    document.addEventListener('click', () => {
+      dropdown.classList.remove('open');
+      avatarBtn.setAttribute('aria-expanded', false);
+    });
+
+    document.getElementById('logout-btn').addEventListener('click', () => {
+      localStorage.clear();
+      window.location.href = 'index.html';
+    });
+
+    /* ── Category badge helper ── */
+    function getCategoryBadge(cat) {
+      const map = {
+        'food': 'badge-amber',
+        'transport': 'badge-cyan',
+        'shopping': 'badge-purple',
+        'health': 'badge-emerald',
+        'entertainment': 'badge-pink',
+        'utilities': 'badge-amber',
+      };
+      return map[(cat || '').toLowerCase()] || 'badge-slate';
+    }
+
+    function formatDate(d) {
+      if (!d) return '—';
+      return new Date(d).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    }
+
+    /* ── Analytics ── */
+    function computeAnalytics(expenses) {
+      const total = expenses.reduce((s, e) => s + (e.total || 0), 0);
+      const count = expenses.length;
+      const avg = count ? total / count : 0;
+
+      // top category
+      const catMap = {};
+      expenses.forEach(e => {
+        const c = (e.category || 'Other').toLowerCase();
+        catMap[c] = (catMap[c] || 0) + (e.total || 0);
+      });
+      const topCat = Object.entries(catMap).sort((a,b) => b[1]-a[1])[0];
+
+      document.getElementById('stat-total').textContent = `$${total.toFixed(2)}`;
+      document.getElementById('stat-count').textContent = count;
+      document.getElementById('stat-top-cat').textContent = topCat ? capitalize(topCat[0]) : '—';
+      document.getElementById('stat-avg').textContent = count ? `$${avg.toFixed(2)}` : '—';
+    }
+
+    function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+    /* ── Render grid ── */
+    function renderExpenses(expenses) {
+      const grid = document.getElementById('expense-grid');
+      const countLabel = document.getElementById('count-label');
+      countLabel.textContent = expenses.length;
+
+      grid.innerHTML = '';
+
+      if (expenses.length === 0) {
+        document.getElementById('empty-state').classList.remove('hidden');
+        return;
+      }
+
+      document.getElementById('empty-state').classList.add('hidden');
+      grid.classList.remove('hidden');
+
+      expenses.forEach((exp, idx) => {
+        const card = document.createElement('article');
+        card.className = 'expense-card glass-card';
+        card.setAttribute('role', 'listitem');
+        card.setAttribute('tabindex', '0');
+        card.setAttribute('aria-label', `${exp.vendor} receipt for $${(exp.total||0).toFixed(2)}, click to expand`);
+
+        const badge = getCategoryBadge(exp.category);
+
+        card.innerHTML = `
+          <div class="ec-top">
+            <div>
+              <p class="ec-vendor">${escapeHtml(exp.vendor || '—')}</p>
+              <div style="margin-top: 8px;">
+                <span class="badge ${badge}">${exp.category || 'Other'}</span>
+              </div>
+            </div>
+            <p class="ec-total">$${(exp.total || 0).toFixed(2)}</p>
+          </div>
+          <div class="ec-meta">
+            <span class="ec-date">📅 ${formatDate(exp.date)}</span>
+            <span class="ec-expand-hint">📎 View details →</span>
+          </div>`;
+
+        card.addEventListener('click', () => openModal(exp));
+        card.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openModal(exp); }
+        });
+
+        // Staggered animation
+        card.style.animationDelay = `${idx * 0.05}s`;
+        card.style.animation = 'cardIn 0.35s ease both';
+
+        grid.appendChild(card);
+      });
+    }
+
+    /* ── Modal ── */
+    function openModal(exp) {
+      const backdrop = document.getElementById('modal-backdrop');
+
+      document.getElementById('modal-vendor').textContent = exp.vendor || '—';
+      document.getElementById('modal-total').textContent = `$${(exp.total || 0).toFixed(2)}`;
+      document.getElementById('modal-total-2').textContent = `$${(exp.total || 0).toFixed(2)}`;
+      document.getElementById('modal-subtotal').textContent = `$${(exp.subtotal || 0).toFixed(2)}`;
+      document.getElementById('modal-tax').textContent = `$${(exp.tax || 0).toFixed(2)}`;
+      document.getElementById('modal-date').textContent = formatDate(exp.date);
+      document.getElementById('modal-summary').textContent = exp.summary || 'No summary available.';
+
+      const badge = getCategoryBadge(exp.category);
+      document.getElementById('modal-category-badge').innerHTML = `<span class="badge ${badge}">${exp.category || 'Other'}</span>`;
+
+      const img = document.getElementById('modal-receipt-img');
+      const noReceipt = document.getElementById('modal-no-receipt');
+
+      if (exp.receipt) {
+        img.src = `data:image/jpeg;base64,${exp.receipt}`;
+        img.classList.remove('hidden');
+        noReceipt.classList.add('hidden');
+      } else {
+        img.classList.add('hidden');
+        noReceipt.classList.remove('hidden');
+      }
+
+      backdrop.classList.add('open');
+      backdrop.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      const backdrop = document.getElementById('modal-backdrop');
+      backdrop.classList.remove('open');
+      backdrop.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    document.getElementById('modal-close').addEventListener('click', closeModal);
+    document.getElementById('modal-backdrop').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('modal-backdrop')) closeModal();
+    });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+    /* ── Fetch profile data ── */
+    async function loadProfile() {
+      try {
+        const res = await fetch(`${API}/profile`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (res.status === 401) {
+          localStorage.clear();
+          window.location.href = 'index.html';
+          return;
+        }
+
+        if (!res.ok) throw new Error('Failed to load receipts');
+
+        const expenses = await res.json();
+
+        document.getElementById('loading-state').classList.add('hidden');
+        computeAnalytics(expenses);
+        renderExpenses(expenses);
+      } catch (err) {
+        document.getElementById('loading-state').classList.add('hidden');
+        showToast(err.message, 'error');
+        document.getElementById('empty-state').classList.remove('hidden');
+      }
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    /* ── Card animation ── */
+    const styleEl = document.createElement('style');
+    styleEl.textContent = `
+      @keyframes cardIn {
+        from { opacity: 0; transform: translateY(12px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+    `;
+    document.head.appendChild(styleEl);
+
+    /* ── Init ── */
+    loadProfile();
+  </script>
+</body>
+</html>

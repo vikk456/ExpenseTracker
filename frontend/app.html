@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ExpenseTracker — Dashboard</title>
+  <meta name="description" content="AI-powered expense tracking dashboard. Upload receipts and chat about your spending." />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* ── App Shell ── */
+    .app-shell {
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: 240px;
+      min-width: 240px;
+      background: rgba(10,10,20,0.75);
+      border-right: 1px solid var(--glass-border);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      display: flex;
+      flex-direction: column;
+      padding: 20px 12px;
+      transition: width var(--transition-slow), min-width var(--transition-slow), padding var(--transition-slow);
+      overflow: hidden;
+      position: relative;
+      z-index: 10;
+    }
+
+    .sidebar.collapsed {
+      width: 64px;
+      min-width: 64px;
+      padding: 20px 8px;
+    }
+
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 8px 24px;
+      margin-bottom: 8px;
+      border-bottom: 1px solid var(--glass-border);
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .sidebar-logo {
+      width: 36px;
+      height: 36px;
+      min-width: 36px;
+      background: var(--gradient-primary);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 4px 14px rgba(139,92,246,0.4);
+    }
+
+    .sidebar-brand-text {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+      opacity: 1;
+      transition: opacity var(--transition-base);
+    }
+
+    .sidebar.collapsed .sidebar-brand-text { opacity: 0; pointer-events: none; }
+
+    /* ── Nav Items ── */
+    .nav-list { list-style: none; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+
+    .nav-item button {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      background: transparent;
+      border: none;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      color: var(--text-secondary);
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 500;
+      transition: all var(--transition-base);
+      text-align: left;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .nav-item button:hover {
+      background: var(--bg-card-hover);
+      color: var(--text-primary);
+    }
+
+    .nav-item.active button {
+      background: rgba(139,92,246,0.15);
+      color: var(--accent-secondary);
+      border: 1px solid rgba(139,92,246,0.2);
+    }
+
+    .nav-icon {
+      font-size: 18px;
+      min-width: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .nav-label {
+      opacity: 1;
+      transition: opacity var(--transition-base);
+    }
+
+    .sidebar.collapsed .nav-label { opacity: 0; }
+
+    .nav-divider {
+      height: 1px;
+      background: var(--glass-border);
+      margin: 8px 0;
+    }
+
+    /* ── Sidebar toggle button ── */
+    .sidebar-toggle {
+      position: absolute;
+      top: 20px;
+      right: -14px;
+      width: 28px;
+      height: 28px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--glass-border);
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: var(--text-secondary);
+      transition: all var(--transition-base);
+      z-index: 20;
+    }
+
+    .sidebar-toggle:hover {
+      background: var(--accent-tertiary);
+      color: #fff;
+      border-color: var(--accent-primary);
+    }
+
+    /* ── Main Content ── */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── Top Bar ── */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 28px;
+      border-bottom: 1px solid var(--glass-border);
+      background: rgba(10,10,20,0.5);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      min-height: 64px;
+    }
+
+    .topbar-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+    }
+
+    .topbar-right { display: flex; align-items: center; gap: 16px; }
+
+    /* ── Profile Avatar / Dropdown ── */
+    .profile-menu { position: relative; }
+
+    .avatar-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--gradient-primary);
+      border: 2px solid rgba(139,92,246,0.4);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      transition: all var(--transition-base);
+      font-family: var(--font);
+    }
+
+    .avatar-btn:hover {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 3px rgba(139,92,246,0.2);
+    }
+
+    .dropdown {
+      position: absolute;
+      top: calc(100% + 10px);
+      right: 0;
+      width: 190px;
+      background: rgba(15,15,28,0.95);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(-6px) scale(0.97);
+      pointer-events: none;
+      transition: all var(--transition-base);
+      z-index: 100;
+    }
+
+    .dropdown.open {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: all;
+    }
+
+    .dropdown-header {
+      padding: 14px 16px 10px;
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .dropdown-username { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+    .dropdown-email { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--text-secondary);
+      transition: all var(--transition-fast);
+      border: none;
+      background: none;
+      width: 100%;
+      font-family: var(--font);
+      text-decoration: none;
+    }
+
+    .dropdown-item:hover { background: var(--bg-card-hover); color: var(--text-primary); }
+    .dropdown-item.danger { color: #f87171; }
+    .dropdown-item.danger:hover { background: rgba(239,68,68,0.1); }
+
+    /* ── Content Area ── */
+    .content-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 32px 36px;
+    }
+
+    /* ── Views ── */
+    .view { display: none; animation: fadeIn 0.3s ease; }
+    .view.active { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ════════════════════════════════════
+       UPLOAD VIEW
+    ════════════════════════════════════ */
+    .upload-view-title {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 6px;
+    }
+
+    .upload-view-sub {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 32px;
+    }
+
+    /* Drop Zone */
+    .drop-zone {
+      border: 2px dashed var(--glass-border);
+      border-radius: var(--radius-xl);
+      padding: 60px 40px;
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--transition-base);
+      background: rgba(255,255,255,0.02);
+      position: relative;
+    }
+
+    .drop-zone:hover, .drop-zone.drag-over {
+      border-color: var(--accent-primary);
+      background: rgba(139,92,246,0.05);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .drop-zone-icon {
+      font-size: 52px;
+      margin-bottom: 16px;
+      display: block;
+      filter: drop-shadow(0 0 20px rgba(139,92,246,0.4));
+    }
+
+    .drop-zone-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .drop-zone-sub { font-size: 14px; color: var(--text-secondary); margin-bottom: 24px; }
+
+    .drop-zone-hint {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 14px;
+    }
+
+    #receipt-file { display: none; }
+
+    /* ── Loading State ── */
+    .upload-loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      padding: 60px;
+      text-align: center;
+    }
+
+    .loading-spinner-lg {
+      width: 56px;
+      height: 56px;
+      border: 3px solid rgba(139,92,246,0.15);
+      border-top-color: var(--accent-primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    .loading-title { font-size: 18px; font-weight: 700; color: var(--text-primary); }
+    .loading-sub { font-size: 14px; color: var(--text-secondary); }
+
+    /* ── Expense Result Card ── */
+    .expense-result {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 32px;
+    }
+
+    .expense-card {
+      padding: 28px;
+    }
+
+    .expense-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .expense-vendor {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -0.03em;
+    }
+
+    .expense-total {
+      font-size: 28px;
+      font-weight: 800;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .expense-meta { display: flex; flex-direction: column; gap: 14px; }
+
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--glass-border);
+      font-size: 14px;
+    }
+
+    .meta-row:last-child { border-bottom: none; }
+    .meta-label { color: var(--text-muted); font-weight: 500; }
+    .meta-value { color: var(--text-primary); font-weight: 600; }
+
+    .expense-summary-section { margin-top: 20px; }
+    .expense-summary-label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+    .expense-summary-text { font-size: 14px; color: var(--text-secondary); line-height: 1.7; font-style: italic; }
+
+    .receipt-image-card { padding: 20px; }
+    .receipt-img { width: 100%; border-radius: var(--radius-md); object-fit: contain; max-height: 500px; }
+    .receipt-img-placeholder { 
+      height: 300px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 12px; color: var(--text-muted); font-size: 14px;
+    }
+
+    .result-actions { display: flex; gap: 12px; margin-top: 12px; }
+
+    /* ════════════════════════════════════
+       CHAT VIEW
+    ════════════════════════════════════ */
+    .chat-wrapper {
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 64px - 64px);
+      max-height: 800px;
+    }
+
+    .chat-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .chat-avatar {
+      width: 44px;
+      height: 44px;
+      background: var(--gradient-secondary);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+
+    .chat-header-info h2 { font-size: 18px; font-weight: 700; letter-spacing: -0.02em; }
+    .chat-header-info p { font-size: 13px; color: var(--text-secondary); }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding: 20px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    }
+
+    .chat-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      gap: 12px;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    .chat-empty-icon { font-size: 48px; opacity: 0.5; }
+    .chat-empty-title { font-size: 16px; font-weight: 600; color: var(--text-secondary); }
+    .chat-empty-sub { font-size: 13px; }
+
+    .chat-message {
+      display: flex;
+      gap: 12px;
+      animation: msgIn 0.25s ease both;
+    }
+
+    @keyframes msgIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .chat-message.user { flex-direction: row-reverse; }
+
+    .msg-avatar {
+      width: 32px;
+      height: 32px;
+      min-width: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .msg-avatar.ai {
+      background: var(--gradient-secondary);
+      color: #fff;
+    }
+
+    .msg-avatar.user-av {
+      background: var(--gradient-primary);
+      color: #fff;
+    }
+
+    .msg-bubble {
+      max-width: 70%;
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .chat-message.user .msg-bubble {
+      background: rgba(139,92,246,0.18);
+      border: 1px solid rgba(139,92,246,0.25);
+      color: var(--text-primary);
+      border-radius: var(--radius-md) 4px var(--radius-md) var(--radius-md);
+    }
+
+    .chat-message.ai .msg-bubble {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--glass-border);
+      color: var(--text-secondary);
+      border-radius: 4px var(--radius-md) var(--radius-md) var(--radius-md);
+    }
+
+    .msg-time {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      text-align: right;
+    }
+
+    .chat-message.ai .msg-time { text-align: left; }
+
+    /* ── Chat Input ── */
+    .chat-input-area {
+      display: flex;
+      gap: 10px;
+      padding: 14px;
+      background: rgba(10,10,20,0.6);
+      border: 1px solid var(--glass-border);
+      border-top: none;
+      border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    }
+
+    .chat-input {
+      flex: 1;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      padding: 10px 16px;
+      font-family: var(--font);
+      font-size: 14px;
+      color: var(--text-primary);
+      outline: none;
+      resize: none;
+      transition: border-color var(--transition-base);
+    }
+
+    .chat-input::placeholder { color: var(--text-muted); }
+    .chat-input:focus { border-color: var(--accent-primary); }
+
+    .chat-send-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
+      background: var(--gradient-primary);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      transition: all var(--transition-base);
+      box-shadow: 0 4px 14px rgba(139,92,246,0.35);
+      flex-shrink: 0;
+    }
+
+    .chat-send-btn:hover { box-shadow: 0 6px 20px rgba(139,92,246,0.55); transform: scale(1.05); }
+    .chat-send-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    /* ── Typing Indicator ── */
+    .typing-indicator {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+      padding: 12px 16px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--glass-border);
+      border-radius: 4px var(--radius-md) var(--radius-md) var(--radius-md);
+    }
+
+    .typing-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--accent-primary);
+      border-radius: 50%;
+      animation: typingBounce 1.2s ease-in-out infinite;
+    }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes typingBounce {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+      30% { transform: translateY(-6px); opacity: 1; }
+    }
+
+    /* ── Chat Data Table ── */
+    .chat-table-wrap {
+      margin-top: 12px;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      border: 1px solid rgba(139,92,246,0.25);
+      background: rgba(10,10,20,0.55);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .chat-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .chat-table thead tr {
+      background: linear-gradient(135deg, rgba(139,92,246,0.25) 0%, rgba(236,72,153,0.15) 100%);
+    }
+
+    .chat-table thead th {
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--accent-secondary);
+      border-bottom: 1px solid rgba(139,92,246,0.3);
+      white-space: nowrap;
+    }
+
+    .chat-table tbody tr {
+      border-bottom: 1px solid var(--glass-border);
+      transition: background var(--transition-fast);
+    }
+
+    .chat-table tbody tr:last-child { border-bottom: none; }
+
+    .chat-table tbody tr:nth-child(even) {
+      background: rgba(255,255,255,0.02);
+    }
+
+    .chat-table tbody tr:hover {
+      background: rgba(139,92,246,0.08);
+    }
+
+    .chat-table tbody td {
+      padding: 9px 14px;
+      color: var(--text-secondary);
+      vertical-align: middle;
+    }
+
+    .chat-table tbody td:first-child {
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .expense-result { grid-template-columns: 1fr; }
+      .content-area { padding: 20px 16px; }
+      .topbar { padding: 12px 16px; }
+    }
+
+    @media (max-width: 640px) {
+      .sidebar { position: fixed; left: -240px; z-index: 100; transition: left var(--transition-slow); }
+      .sidebar.mobile-open { left: 0; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Background Orbs -->
+  <div class="bg-orbs" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container" role="alert" aria-live="polite"></div>
+
+  <div class="app-shell">
+
+    <!-- ── Sidebar ── -->
+    <aside class="sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
+      <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle sidebar" title="Toggle sidebar">◀</button>
+
+      <div class="sidebar-brand">
+        <div class="sidebar-logo" aria-hidden="true">💸</div>
+        <span class="sidebar-brand-text">ExpenseTracker</span>
+      </div>
+
+      <ul class="nav-list" role="list">
+        <li class="nav-item active" id="nav-upload">
+          <button onclick="switchView('upload')" aria-label="Upload Receipt">
+            <span class="nav-icon" aria-hidden="true">🧾</span>
+            <span class="nav-label">Upload Receipt</span>
+          </button>
+        </li>
+        <li class="nav-item" id="nav-chat">
+          <button onclick="switchView('chat')" aria-label="Chat">
+            <span class="nav-icon" aria-hidden="true">💬</span>
+            <span class="nav-label">Chat</span>
+          </button>
+        </li>
+
+        <li class="nav-divider" role="separator"></li>
+
+        <li class="nav-item" id="nav-profile">
+          <button onclick="window.location.href='profile.html'" aria-label="Profile & History">
+            <span class="nav-icon" aria-hidden="true">📊</span>
+            <span class="nav-label">History</span>
+          </button>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- ── Main Content ── -->
+    <div class="main-content">
+      <!-- Top Bar -->
+      <header class="topbar">
+        <h1 class="topbar-title" id="page-title">Upload Receipt</h1>
+
+        <div class="topbar-right">
+          <!-- Profile dropdown -->
+          <div class="profile-menu" id="profile-menu">
+            <button class="avatar-btn" id="avatar-btn" aria-label="Open profile menu" aria-expanded="false" aria-haspopup="true">
+              <span id="avatar-initials">?</span>
+            </button>
+
+            <div class="dropdown" id="dropdown" role="menu" aria-label="Profile menu">
+              <div class="dropdown-header">
+                <div class="dropdown-username" id="dd-username">Loading…</div>
+                <div class="dropdown-email" id="dd-email"></div>
+              </div>
+              <a href="profile.html" class="dropdown-item" role="menuitem">
+                <span aria-hidden="true">📊</span> My Receipts
+              </a>
+              <button class="dropdown-item danger" id="logout-btn" role="menuitem">
+                <span aria-hidden="true">🚪</span> Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content Area -->
+      <main class="content-area">
+
+        <!-- ══════════════════
+             UPLOAD VIEW
+        ══════════════════ -->
+        <section id="view-upload" class="view active" aria-labelledby="upload-heading">
+          <h2 id="upload-heading" class="upload-view-title">
+            Upload a <span class="text-gradient">Receipt</span>
+          </h2>
+          <p class="upload-view-sub">Drag & drop or click to upload. Our AI will extract all expense details.</p>
+
+          <!-- Drop Zone -->
+          <div id="drop-zone" class="drop-zone" role="button" tabindex="0" aria-label="Click or drag to upload receipt image">
+            <span class="drop-zone-icon" aria-hidden="true">📤</span>
+            <p class="drop-zone-title">Drop your receipt here</p>
+            <p class="drop-zone-sub">or click to browse files</p>
+            <button type="button" class="btn btn-primary btn-sm" onclick="event.stopPropagation(); document.getElementById('receipt-file').click()">
+              Choose File
+            </button>
+            <p class="drop-zone-hint">Supports JPG, PNG, WEBP, PDF up to 10MB</p>
+          </div>
+          <input type="file" id="receipt-file" accept="image/*,.pdf" aria-label="Receipt file input" />
+
+          <!-- Loading State -->
+          <div id="upload-loading" class="glass-card upload-loading hidden" role="status" aria-live="polite">
+            <div class="loading-spinner-lg" aria-hidden="true"></div>
+            <p class="loading-title">Analyzing your receipt…</p>
+            <p class="loading-sub">Our AI is extracting expense details. This takes a moment.</p>
+          </div>
+
+          <!-- Result -->
+          <div id="upload-result" class="hidden">
+            <div class="expense-result">
+              <!-- Expense Data Card -->
+              <div class="glass-card expense-card" id="expense-data-card">
+                <div class="expense-card-header">
+                  <div>
+                    <p class="expense-vendor" id="res-vendor">—</p>
+                    <div id="res-category-badge" style="margin-top: 8px;"></div>
+                  </div>
+                  <p class="expense-total" id="res-total">$0.00</p>
+                </div>
+
+                <div class="expense-meta">
+                  <div class="meta-row">
+                    <span class="meta-label">📅 Date</span>
+                    <span class="meta-value" id="res-date">—</span>
+                  </div>
+                  <div class="meta-row">
+                    <span class="meta-label">🧾 Subtotal</span>
+                    <span class="meta-value" id="res-subtotal">—</span>
+                  </div>
+                  <div class="meta-row">
+                    <span class="meta-label">💸 Tax</span>
+                    <span class="meta-value" id="res-tax">—</span>
+                  </div>
+                  <div class="meta-row">
+                    <span class="meta-label">💰 Total</span>
+                    <span class="meta-value" id="res-total-2" style="color: var(--accent-secondary); font-size: 16px;">—</span>
+                  </div>
+                </div>
+
+                <div class="expense-summary-section">
+                  <p class="expense-summary-label">AI Summary</p>
+                  <p class="expense-summary-text" id="res-summary">—</p>
+                </div>
+              </div>
+
+              <!-- Receipt Image Card -->
+              <div class="glass-card receipt-image-card">
+                <p class="expense-summary-label" style="margin-bottom: 14px;">📸 Receipt Image</p>
+                <img id="res-receipt-img" class="receipt-img hidden" alt="Uploaded receipt" />
+                <div id="res-receipt-placeholder" class="receipt-img-placeholder">
+                  <span style="font-size: 48px; opacity: 0.3;">🧾</span>
+                  <span>Receipt image will appear here</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="result-actions" style="margin-top: 20px;">
+              <button class="btn btn-ghost btn-sm" onclick="resetUpload()">
+                <span>⬆️</span> Upload Another
+              </button>
+              <a href="profile.html" class="btn btn-ghost btn-sm">
+                <span>📊</span> View All Receipts
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <!-- ══════════════════
+             CHAT VIEW
+        ══════════════════ -->
+        <section id="view-chat" class="view" aria-labelledby="chat-heading">
+          <div class="chat-header">
+            <div class="chat-avatar" aria-hidden="true">🤖</div>
+            <div class="chat-header-info">
+              <h2 id="chat-heading">Expense Assistant</h2>
+              <p>Ask anything about your spending history</p>
+            </div>
+          </div>
+
+          <div class="chat-wrapper">
+            <div class="chat-messages" id="chat-messages" aria-live="polite" aria-label="Chat messages">
+              <div class="chat-empty" id="chat-empty">
+                <span class="chat-empty-icon" aria-hidden="true">💬</span>
+                <p class="chat-empty-title">Ask me anything about your expenses</p>
+                <p class="chat-empty-sub">Try: "What did I spend last week?" or "Which category costs the most?"</p>
+              </div>
+            </div>
+
+            <div class="chat-input-area">
+              <textarea class="chat-input" id="chat-input" rows="1"
+                placeholder="Ask about your spending…"
+                aria-label="Chat message input"
+                onkeydown="handleChatKey(event)"></textarea>
+              <button class="chat-send-btn" id="chat-send" onclick="sendMessage()" aria-label="Send message">
+                ➤
+              </button>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const API = 'http://localhost:8000';
+    const token = localStorage.getItem('access_token');
+    const userId = parseInt(localStorage.getItem('user_id'));
+    const username = localStorage.getItem('username') || 'User';
+    const email = localStorage.getItem('email') || '';
+
+    /* ── Auth Guard ── */
+    if (!token) window.location.href = 'index.html';
+
+    /* ── Init UI with user info ── */
+    document.getElementById('avatar-initials').textContent = username.charAt(0).toUpperCase();
+    document.getElementById('dd-username').textContent = username;
+    document.getElementById('dd-email').textContent = email;
+
+    /* ── Toast ── */
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      toast.innerHTML = `<span class="toast-icon">${icons[type]}</span><span class="toast-message">${message}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.classList.add('toast-out');
+        toast.addEventListener('animationend', () => toast.remove(), { once: true });
+      }, 3500);
+    }
+
+    /* ── Auth fetch helper ── */
+    async function authFetch(url, options = {}) {
+      const res = await fetch(url, {
+        ...options,
+        headers: { Authorization: `Bearer ${token}`, ...(options.headers || {}) }
+      });
+      if (res.status === 401) {
+        localStorage.clear();
+        window.location.href = 'index.html';
+      }
+      return res;
+    }
+
+    /* ── Sidebar toggle ── */
+    const sidebar = document.getElementById('sidebar');
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    let sidebarCollapsed = false;
+
+    sidebarToggle.addEventListener('click', () => {
+      sidebarCollapsed = !sidebarCollapsed;
+      sidebar.classList.toggle('collapsed', sidebarCollapsed);
+      sidebarToggle.textContent = sidebarCollapsed ? '▶' : '◀';
+      sidebarToggle.title = sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar';
+    });
+
+    /* ── View switching ── */
+    const viewTitles = { upload: 'Upload Receipt', chat: 'AI Chat' };
+
+    function switchView(name) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.getElementById(`view-${name}`).classList.add('active');
+      document.getElementById(`nav-${name}`).classList.add('active');
+      document.getElementById('page-title').textContent = viewTitles[name] || name;
+    }
+
+    /* ── Profile dropdown ── */
+    const avatarBtn = document.getElementById('avatar-btn');
+    const dropdown = document.getElementById('dropdown');
+
+    avatarBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = dropdown.classList.toggle('open');
+      avatarBtn.setAttribute('aria-expanded', isOpen);
+    });
+
+    document.addEventListener('click', () => {
+      dropdown.classList.remove('open');
+      avatarBtn.setAttribute('aria-expanded', false);
+    });
+
+    /* ── Logout ── */
+    document.getElementById('logout-btn').addEventListener('click', () => {
+      localStorage.clear();
+      showToast('Logged out successfully', 'info');
+      setTimeout(() => window.location.href = 'index.html', 600);
+    });
+
+    /* ════════════════════════════════════
+       UPLOAD LOGIC
+    ════════════════════════════════════ */
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('receipt-file');
+
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    dropZone.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); }
+    });
+
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('drag-over');
+    });
+
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('drag-over');
+      const file = e.dataTransfer.files[0];
+      if (file) processFile(file);
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files && e.target.files.length > 0) processFile(e.target.files[0]);
+    });
+
+    function resetUpload() {
+      document.getElementById('drop-zone').classList.remove('hidden');
+      document.getElementById('upload-loading').classList.add('hidden');
+      document.getElementById('upload-result').classList.add('hidden');
+      fileInput.value = '';
+    }
+
+    async function processFile(file) {
+      // Validate file size (10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        return showToast('File too large. Max size is 10MB.', 'error');
+      }
+
+      // Show loading
+      document.getElementById('drop-zone').classList.add('hidden');
+      document.getElementById('upload-loading').classList.remove('hidden');
+      document.getElementById('upload-result').classList.add('hidden');
+
+      // Preview image locally while loading
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const img = document.getElementById('res-receipt-img');
+        img.src = ev.target.result;
+        img.classList.remove('hidden');
+        document.getElementById('res-receipt-placeholder').classList.add('hidden');
+      };
+      reader.readAsDataURL(file);
+
+      try {
+        const form = new FormData();
+        form.append('file', file);
+
+        const res = await authFetch(`${API}/upload`, { method: 'POST', body: form });
+        const data = await res.json();
+
+        if (!res.ok) throw new Error(data.detail || 'Upload failed');
+
+        // Populate result
+        document.getElementById('res-vendor').textContent = data.vendor || '—';
+        document.getElementById('res-total').textContent = `$${(data.total || 0).toFixed(2)}`;
+        document.getElementById('res-total-2').textContent = `$${(data.total || 0).toFixed(2)}`;
+        document.getElementById('res-subtotal').textContent = `$${(data.subtotal || 0).toFixed(2)}`;
+        document.getElementById('res-tax').textContent = `$${(data.tax || 0).toFixed(2)}`;
+        document.getElementById('res-summary').textContent = data.summary || '—';
+
+        const dateStr = data.date ? new Date(data.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '—';
+        document.getElementById('res-date').textContent = dateStr;
+
+        const cat = data.category || 'Other';
+        const badgeClass = getCategoryBadge(cat);
+        document.getElementById('res-category-badge').innerHTML = `<span class="badge ${badgeClass}">${cat}</span>`;
+
+        // Show receipt image from base64 if available
+        if (data.receipt) {
+          const img = document.getElementById('res-receipt-img');
+          img.src = `data:image/jpeg;base64,${data.receipt}`;
+          img.classList.remove('hidden');
+          document.getElementById('res-receipt-placeholder').classList.add('hidden');
+        }
+
+        document.getElementById('upload-loading').classList.add('hidden');
+        document.getElementById('upload-result').classList.remove('hidden');
+        fileInput.value = '';
+        showToast('Receipt analyzed successfully!', 'success');
+      } catch (err) {
+        document.getElementById('upload-loading').classList.add('hidden');
+        document.getElementById('drop-zone').classList.remove('hidden');
+        showToast(err.message, 'error');
+      }
+    }
+
+    /* ════════════════════════════════════
+       CHAT LOGIC
+    ════════════════════════════════════ */
+    let chatMessages = [];
+
+    function handleChatKey(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    }
+
+    function getTime() {
+      return new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function buildChatTable(rows) {
+      if (!Array.isArray(rows) || rows.length === 0) return '';
+      const keys = Object.keys(rows[0]);
+      const headerCells = keys.map(k =>
+        `<th>${escapeHtml(String(k).replace(/_/g, ' '))}</th>`
+      ).join('');
+      const bodyRows = rows.map(row =>
+        `<tr>${keys.map(k => `<td>${escapeHtml(row[k] != null ? String(row[k]) : '—')}</td>`).join('')}</tr>`
+      ).join('');
+      return `
+        <div class="chat-table-wrap">
+          <table class="chat-table">
+            <thead><tr>${headerCells}</tr></thead>
+            <tbody>${bodyRows}</tbody>
+          </table>
+        </div>`;
+    }
+
+    function appendMessage(role, text, tableData = null) {
+      const container = document.getElementById('chat-messages');
+      const empty = document.getElementById('chat-empty');
+      if (empty) empty.style.display = 'none';
+
+      const isUser = role === 'user';
+      const initials = isUser ? username.charAt(0).toUpperCase() : 'AI';
+      const avatarClass = isUser ? 'user-av' : 'ai';
+
+      let tableHTML = '';
+      if (!isUser && tableData) {
+        try {
+          const rows = typeof tableData === 'string' ? JSON.parse(tableData) : tableData;
+          tableHTML = buildChatTable(rows);
+        } catch (_) { /* malformed table_data — skip silently */ }
+      }
+
+      const wrapper = document.createElement('div');
+      wrapper.className = `chat-message ${isUser ? 'user' : 'ai'}`;
+      wrapper.innerHTML = `
+        <div class="msg-avatar ${avatarClass}">${initials}</div>
+        <div>
+          <div class="msg-bubble">${escapeHtml(text)}${tableHTML}</div>
+          <div class="msg-time">${getTime()}</div>
+        </div>`;
+      container.appendChild(wrapper);
+      container.scrollTop = container.scrollHeight;
+      return wrapper;
+    }
+
+    function appendTyping() {
+      const container = document.getElementById('chat-messages');
+      const wrapper = document.createElement('div');
+      wrapper.className = 'chat-message ai';
+      wrapper.id = 'typing-indicator';
+      wrapper.innerHTML = `
+        <div class="msg-avatar ai">AI</div>
+        <div class="typing-indicator">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+        </div>`;
+      container.appendChild(wrapper);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function removeTyping() {
+      const el = document.getElementById('typing-indicator');
+      if (el) el.remove();
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g, '<br>');
+    }
+
+    async function sendMessage() {
+      const input = document.getElementById('chat-input');
+      const query = input.value.trim();
+      if (!query) return;
+
+      input.value = '';
+      document.getElementById('chat-send').disabled = true;
+      appendMessage('user', query);
+      appendTyping();
+
+      try {
+        const res = await authFetch(`${API}/query`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query, user_id: userId })
+        });
+        const data = await res.json();
+        removeTyping();
+
+        if (!res.ok) throw new Error(data.detail || 'Query failed');
+        appendMessage(
+          'ai',
+          data.response || 'I couldn\'t process that query. Please try again.',
+          data.table_data || null
+        );
+      } catch (err) {
+        removeTyping();
+        appendMessage('ai', `Sorry, I encountered an error: ${err.message}`);
+      } finally {
+        document.getElementById('chat-send').disabled = false;
+        input.focus();
+      }
+    }
+
+    /* ── Category badge helper ── */
+    function getCategoryBadge(cat) {
+      const map = {
+        'food': 'badge-amber',
+        'transport': 'badge-cyan',
+        'shopping': 'badge-purple',
+        'health': 'badge-emerald',
+        'entertainment': 'badge-pink',
+        'utilities': 'badge-amber',
+      };
+      const key = (cat || '').toLowerCase();
+      return map[key] || 'badge-slate';
+    }
+  </script>
+</body>
+</html>
