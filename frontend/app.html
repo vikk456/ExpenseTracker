@@ -734,11 +734,13 @@
       -webkit-backdrop-filter: blur(4px);
       z-index: 99;
       opacity: 0;
+      pointer-events: none;
       transition: opacity var(--transition-base);
     }
 
     .sidebar-overlay.visible {
       opacity: 1;
+      pointer-events: all;
     }
 
     /* ── Responsive ── */
@@ -1120,7 +1122,12 @@
     const dropZone = document.getElementById('drop-zone');
     const fileInput = document.getElementById('receipt-file');
 
-    dropZone.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('click', (e) => {
+      if (document.getElementById('view-upload').classList.contains('active') && 
+          !e.target.closest('.btn')) {
+          fileInput.click();
+      }
+    });
 
     dropZone.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); }
