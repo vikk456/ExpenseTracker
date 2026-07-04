@@ -679,6 +679,68 @@
       font-weight: 500;
     }
 
+    /* ── Hamburger Button (mobile only) ── */
+    .hamburger-btn {
+      display: none;
+      width: 40px;
+      height: 40px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: all var(--transition-base);
+      flex-shrink: 0;
+    }
+
+    .hamburger-btn:hover {
+      background: rgba(139,92,246,0.15);
+      border-color: rgba(139,92,246,0.4);
+    }
+
+    .hamburger-btn span {
+      display: block;
+      width: 18px;
+      height: 2px;
+      background: var(--text-secondary);
+      border-radius: 2px;
+      transition: all var(--transition-base);
+      transform-origin: center;
+    }
+
+    .hamburger-btn.open span:nth-child(1) {
+      transform: translateY(7px) rotate(45deg);
+      background: var(--accent-primary);
+    }
+    .hamburger-btn.open span:nth-child(2) {
+      opacity: 0;
+      transform: scaleX(0);
+    }
+    .hamburger-btn.open span:nth-child(3) {
+      transform: translateY(-7px) rotate(-45deg);
+      background: var(--accent-primary);
+    }
+
+    /* ── Mobile Overlay ── */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 99;
+      opacity: 0;
+      transition: opacity var(--transition-base);
+    }
+
+    .sidebar-overlay.visible {
+      opacity: 1;
+    }
+
     /* ── Responsive ── */
     @media (max-width: 900px) {
       .expense-result { grid-template-columns: 1fr; }
@@ -687,8 +749,27 @@
     }
 
     @media (max-width: 640px) {
-      .sidebar { position: fixed; left: -240px; z-index: 100; transition: left var(--transition-slow); }
-      .sidebar.mobile-open { left: 0; }
+      .hamburger-btn { display: flex; }
+      .sidebar-toggle { display: none; }
+      .sidebar {
+        position: fixed;
+        left: -260px;
+        top: 0;
+        bottom: 0;
+        height: 100vh;
+        z-index: 200;
+        transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                    box-shadow 0.3s ease;
+        box-shadow: none;
+        width: 240px;
+        min-width: 240px;
+      }
+      .sidebar.mobile-open {
+        left: 0;
+        box-shadow: 4px 0 40px rgba(0,0,0,0.5), 0 0 80px rgba(139,92,246,0.15);
+      }
+      .sidebar-overlay { display: block; }
+      .topbar-left { display: flex; align-items: center; gap: 10px; }
     }
   </style>
 </head>
@@ -702,6 +783,9 @@
 
   <!-- Toast Container -->
   <div id="toast-container" role="alert" aria-live="polite"></div>
+
+  <!-- Mobile Sidebar Overlay -->
+  <div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
 
   <div class="app-shell">
 
@@ -743,7 +827,14 @@
     <div class="main-content">
       <!-- Top Bar -->
       <header class="topbar">
-        <h1 class="topbar-title" id="page-title">Upload Receipt</h1>
+        <div class="topbar-left">
+          <button class="hamburger-btn" id="hamburger-btn" aria-label="Open navigation menu" aria-expanded="false" aria-controls="sidebar">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+          <h1 class="topbar-title" id="page-title">Upload Receipt</h1>
+        </div>
 
         <div class="topbar-right">
           <!-- Profile dropdown -->
@@ -938,7 +1029,7 @@
       return res;
     }
 
-    /* ── Sidebar toggle ── */
+    /* ── Sidebar toggle (desktop collapse) ── */
     const sidebar = document.getElementById('sidebar');
     const sidebarToggle = document.getElementById('sidebar-toggle');
     let sidebarCollapsed = false;
@@ -950,6 +1041,44 @@
       sidebarToggle.title = sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar';
     });
 
+    /* ── Mobile Sidebar ── */
+    const hamburgerBtn = document.getElementById('hamburger-btn');
+    const sidebarOverlay = document.getElementById('sidebar-overlay');
+
+    function openMobileSidebar() {
+      sidebar.classList.add('mobile-open');
+      sidebarOverlay.classList.add('visible');
+      hamburgerBtn.classList.add('open');
+      hamburgerBtn.setAttribute('aria-expanded', 'true');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeMobileSidebar() {
+      sidebar.classList.remove('mobile-open');
+      sidebarOverlay.classList.remove('visible');
+      hamburgerBtn.classList.remove('open');
+      hamburgerBtn.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+    }
+
+    hamburgerBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (sidebar.classList.contains('mobile-open')) {
+        closeMobileSidebar();
+      } else {
+        openMobileSidebar();
+      }
+    });
+
+    sidebarOverlay.addEventListener('click', closeMobileSidebar);
+
+    /* Close sidebar when navigating on mobile */
+    sidebar.querySelectorAll('.nav-item button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (window.innerWidth <= 640) closeMobileSidebar();
+      });
+    });
+
     /* ── View switching ── */
     const viewTitles = { upload: 'Upload Receipt', chat: 'AI Chat' };
 
@@ -959,6 +1088,8 @@
       document.getElementById(`view-${name}`).classList.add('active');
       document.getElementById(`nav-${name}`).classList.add('active');
       document.getElementById('page-title').textContent = viewTitles[name] || name;
+      /* Auto-close sidebar on mobile after switching view */
+      if (window.innerWidth <= 640) closeMobileSidebar();
     }
 
     /* ── Profile dropdown ── */
