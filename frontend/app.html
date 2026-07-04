@@ -751,6 +751,8 @@
     }
 
     @media (max-width: 640px) {
+      /* Remove stacking context so fixed sidebar (z-index:300) beats overlay (z-index:99) */
+      .app-shell { z-index: auto; }
       .hamburger-btn { display: flex; }
       .sidebar-toggle { display: none; }
       .sidebar {
