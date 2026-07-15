@@ -13,3 +13,5 @@ langgraph
 python-multipart
 python-dotenv
 python-dateutil
+pdf2image
+poppler-utils
