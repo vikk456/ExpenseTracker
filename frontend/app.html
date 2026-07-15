@@ -1,13 +1,13 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ExpenseTracker â€” Dashboard</title>
+  <title>ExpenseTracker — Dashboard</title>
   <meta name="description" content="AI-powered expense tracking dashboard. Upload receipts and chat about your spending." />
   <link rel="stylesheet" href="styles.css" />
   <style>
-    /* â”€â”€ App Shell â”€â”€ */
+    /* ── App Shell ── */
     .app-shell {
       display: flex;
       height: 100vh;
@@ -16,7 +16,7 @@
       z-index: 1;
     }
 
-    /* â”€â”€ Sidebar â”€â”€ */
+    /* ── Sidebar ── */
     .sidebar {
       width: 240px;
       min-width: 240px;
@@ -74,7 +74,7 @@
 
     .sidebar.collapsed .sidebar-brand-text { opacity: 0; pointer-events: none; }
 
-    /* â”€â”€ Nav Items â”€â”€ */
+    /* ── Nav Items ── */
     .nav-list { list-style: none; display: flex; flex-direction: column; gap: 4px; flex: 1; }
 
     .nav-item button {
@@ -129,7 +129,7 @@
       margin: 8px 0;
     }
 
-    /* â”€â”€ Sidebar toggle button â”€â”€ */
+    /* ── Sidebar toggle button ── */
     .sidebar-toggle {
       position: absolute;
       top: 20px;
@@ -155,7 +155,7 @@
       border-color: var(--accent-primary);
     }
 
-    /* â”€â”€ Main Content â”€â”€ */
+    /* ── Main Content ── */
     .main-content {
       flex: 1;
       display: flex;
@@ -163,7 +163,7 @@
       overflow: hidden;
     }
 
-    /* â”€â”€ Top Bar â”€â”€ */
+    /* ── Top Bar ── */
     .topbar {
       display: flex;
       align-items: center;
@@ -185,7 +185,7 @@
 
     .topbar-right { display: flex; align-items: center; gap: 16px; }
 
-    /* â”€â”€ Profile Avatar / Dropdown â”€â”€ */
+    /* ── Profile Avatar / Dropdown ── */
     .profile-menu { position: relative; }
 
     .avatar-btn {
@@ -263,14 +263,14 @@
     .dropdown-item.danger { color: #f87171; }
     .dropdown-item.danger:hover { background: rgba(239,68,68,0.1); }
 
-    /* â”€â”€ Content Area â”€â”€ */
+    /* ── Content Area ── */
     .content-area {
       flex: 1;
       overflow-y: auto;
       padding: 32px 36px;
     }
 
-    /* â”€â”€ Views â”€â”€ */
+    /* ── Views ── */
     .view { display: none; animation: fadeIn 0.3s ease; }
     .view.active { display: block; }
 
@@ -279,9 +279,9 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    /* ════════════════════════════════════
        UPLOAD VIEW
-    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    ════════════════════════════════════ */
     .upload-view-title {
       font-size: 26px;
       font-weight: 800;
@@ -337,7 +337,7 @@
 
     #receipt-file { display: none; }
 
-    /* â”€â”€ Loading State â”€â”€ */
+    /* ── Loading State ── */
     .upload-loading {
       display: flex;
       flex-direction: column;
@@ -360,7 +360,7 @@
     .loading-title { font-size: 18px; font-weight: 700; color: var(--text-primary); }
     .loading-sub { font-size: 14px; color: var(--text-secondary); }
 
-    /* â”€â”€ Expense Result Card â”€â”€ */
+    /* ── Expense Result Card ── */
     .expense-result {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -423,9 +423,9 @@
 
     .result-actions { display: flex; gap: 12px; margin-top: 12px; }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    /* ════════════════════════════════════
        CHAT VIEW
-    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    ════════════════════════════════════ */
     .chat-wrapper {
       display: flex;
       flex-direction: column;
@@ -547,7 +547,7 @@
 
     .chat-message.ai .msg-time { text-align: left; }
 
-    /* â”€â”€ Chat Input â”€â”€ */
+    /* ── Chat Input ── */
     .chat-input-area {
       display: flex;
       gap: 10px;
@@ -594,7 +594,7 @@
     .chat-send-btn:hover { box-shadow: 0 6px 20px rgba(139,92,246,0.55); transform: scale(1.05); }
     .chat-send-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-    /* â”€â”€ Typing Indicator â”€â”€ */
+    /* ── Typing Indicator ── */
     .typing-indicator {
       display: flex;
       gap: 4px;
@@ -620,7 +620,7 @@
       30% { transform: translateY(-6px); opacity: 1; }
     }
 
-    /* â”€â”€ Chat Data Table â”€â”€ */
+    /* ── Chat Data Table ── */
     .chat-table-wrap {
       margin-top: 12px;
       border-radius: var(--radius-md);
@@ -679,7 +679,7 @@
       font-weight: 500;
     }
 
-    /* â”€â”€ Hamburger Button (mobile only) â”€â”€ */
+    /* ── Hamburger Button (mobile only) ── */
     .hamburger-btn {
       display: none;
       width: 40px;
@@ -724,7 +724,7 @@
       background: var(--accent-primary);
     }
 
-    /* â”€â”€ Mobile Overlay â”€â”€ */
+    /* ── Mobile Overlay ── */
     .sidebar-overlay {
       display: none;
       position: fixed;
@@ -743,7 +743,7 @@
       pointer-events: all;
     }
 
-    /* â”€â”€ Responsive â”€â”€ */
+    /* ── Responsive ── */
     @media (max-width: 900px) {
       .expense-result { grid-template-columns: 1fr; }
       .content-area { padding: 20px 16px; }
@@ -794,25 +794,25 @@
 
   <div class="app-shell">
 
-    <!-- â”€â”€ Sidebar â”€â”€ -->
+    <!-- ── Sidebar ── -->
     <aside class="sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
-      <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle sidebar" title="Toggle sidebar">â—€</button>
+      <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle sidebar" title="Toggle sidebar">◀</button>
 
       <div class="sidebar-brand">
-        <div class="sidebar-logo" aria-hidden="true">ðŸ’¸</div>
+        <div class="sidebar-logo" aria-hidden="true">💸</div>
         <span class="sidebar-brand-text">ExpenseTracker</span>
       </div>
 
       <ul class="nav-list" role="list">
         <li class="nav-item active" id="nav-upload">
           <button onclick="switchView('upload')" aria-label="Upload Receipt">
-            <span class="nav-icon" aria-hidden="true">ðŸ§¾</span>
+            <span class="nav-icon" aria-hidden="true">🧾</span>
             <span class="nav-label">Upload Receipt</span>
           </button>
         </li>
         <li class="nav-item" id="nav-chat">
           <button onclick="switchView('chat')" aria-label="Chat">
-            <span class="nav-icon" aria-hidden="true">ðŸ’¬</span>
+            <span class="nav-icon" aria-hidden="true">💬</span>
             <span class="nav-label">Chat</span>
           </button>
         </li>
@@ -821,14 +821,14 @@
 
         <li class="nav-item" id="nav-profile">
           <button onclick="window.location.href='profile.html'" aria-label="Profile & History">
-            <span class="nav-icon" aria-hidden="true">ðŸ“Š</span>
+            <span class="nav-icon" aria-hidden="true">📊</span>
             <span class="nav-label">History</span>
           </button>
         </li>
       </ul>
     </aside>
 
-    <!-- â”€â”€ Main Content â”€â”€ -->
+    <!-- ── Main Content ── -->
     <div class="main-content">
       <!-- Top Bar -->
       <header class="topbar">
@@ -850,14 +850,14 @@
 
             <div class="dropdown" id="dropdown" role="menu" aria-label="Profile menu">
               <div class="dropdown-header">
-                <div class="dropdown-username" id="dd-username">Loadingâ€¦</div>
+                <div class="dropdown-username" id="dd-username">Loading…</div>
                 <div class="dropdown-email" id="dd-email"></div>
               </div>
               <a href="profile.html" class="dropdown-item" role="menuitem">
-                <span aria-hidden="true">ðŸ“Š</span> My Receipts
+                <span aria-hidden="true">📊</span> My Receipts
               </a>
               <button class="dropdown-item danger" id="logout-btn" role="menuitem">
-                <span aria-hidden="true">ðŸšª</span> Logout
+                <span aria-hidden="true">🚪</span> Logout
               </button>
             </div>
           </div>
@@ -867,9 +867,9 @@
       <!-- Content Area -->
       <main class="content-area">
 
-        <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+        <!-- ══════════════════
              UPLOAD VIEW
-        â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+        ══════════════════ -->
         <section id="view-upload" class="view active" aria-labelledby="upload-heading">
           <h2 id="upload-heading" class="upload-view-title">
             Upload a <span class="text-gradient">Receipt</span>
@@ -878,7 +878,7 @@
 
           <!-- Drop Zone -->
           <div id="drop-zone" class="drop-zone" role="button" tabindex="0" aria-label="Click or drag to upload receipt image">
-            <span class="drop-zone-icon" aria-hidden="true">ðŸ“¤</span>
+            <span class="drop-zone-icon" aria-hidden="true">📤</span>
             <p class="drop-zone-title">Drop your receipt here</p>
             <p class="drop-zone-sub">or click to browse files</p>
             <button type="button" class="btn btn-primary btn-sm" onclick="event.stopPropagation(); document.getElementById('receipt-file').click()">
@@ -891,7 +891,7 @@
           <!-- Loading State -->
           <div id="upload-loading" class="glass-card upload-loading hidden" role="status" aria-live="polite">
             <div class="loading-spinner-lg" aria-hidden="true"></div>
-            <p class="loading-title">Analyzing your receiptâ€¦</p>
+            <p class="loading-title">Analyzing your receipt…</p>
             <p class="loading-sub">Our AI is extracting expense details. This takes a moment.</p>
           </div>
 
@@ -902,43 +902,43 @@
               <div class="glass-card expense-card" id="expense-data-card">
                 <div class="expense-card-header">
                   <div>
-                    <p class="expense-vendor" id="res-vendor">â€”</p>
+                    <p class="expense-vendor" id="res-vendor">—</p>
                     <div id="res-category-badge" style="margin-top: 8px;"></div>
                   </div>
-                  <p class="expense-total" id="res-total">₹0.00</p>
+                  <p class="expense-total" id="res-total">$0.00</p>
                 </div>
 
                 <div class="expense-meta">
                   <div class="meta-row">
-                    <span class="meta-label">ðŸ“… Date</span>
-                    <span class="meta-value" id="res-date">â€”</span>
+                    <span class="meta-label">📅 Date</span>
+                    <span class="meta-value" id="res-date">—</span>
                   </div>
                   <div class="meta-row">
-                    <span class="meta-label">ðŸ§¾ Subtotal</span>
-                    <span class="meta-value" id="res-subtotal">â€”</span>
+                    <span class="meta-label">🧾 Subtotal</span>
+                    <span class="meta-value" id="res-subtotal">—</span>
                   </div>
                   <div class="meta-row">
-                    <span class="meta-label">ðŸ’¸ Tax</span>
-                    <span class="meta-value" id="res-tax">â€”</span>
+                    <span class="meta-label">💸 Tax</span>
+                    <span class="meta-value" id="res-tax">—</span>
                   </div>
                   <div class="meta-row">
-                    <span class="meta-label">ðŸ’° Total</span>
-                    <span class="meta-value" id="res-total-2" style="color: var(--accent-secondary); font-size: 16px;">â€”</span>
+                    <span class="meta-label">💰 Total</span>
+                    <span class="meta-value" id="res-total-2" style="color: var(--accent-secondary); font-size: 16px;">—</span>
                   </div>
                 </div>
 
                 <div class="expense-summary-section">
                   <p class="expense-summary-label">AI Summary</p>
-                  <p class="expense-summary-text" id="res-summary">â€”</p>
+                  <p class="expense-summary-text" id="res-summary">—</p>
                 </div>
               </div>
 
               <!-- Receipt Image Card -->
               <div class="glass-card receipt-image-card">
-                <p class="expense-summary-label" style="margin-bottom: 14px;">ðŸ“¸ Receipt Image</p>
+                <p class="expense-summary-label" style="margin-bottom: 14px;">📸 Receipt Image</p>
                 <img id="res-receipt-img" class="receipt-img hidden" alt="Uploaded receipt" />
                 <div id="res-receipt-placeholder" class="receipt-img-placeholder">
-                  <span style="font-size: 48px; opacity: 0.3;">ðŸ§¾</span>
+                  <span style="font-size: 48px; opacity: 0.3;">🧾</span>
                   <span>Receipt image will appear here</span>
                 </div>
               </div>
@@ -946,21 +946,21 @@
 
             <div class="result-actions" style="margin-top: 20px;">
               <button class="btn btn-ghost btn-sm" onclick="resetUpload()">
-                <span>â¬†ï¸</span> Upload Another
+                <span>⬆️</span> Upload Another
               </button>
               <a href="profile.html" class="btn btn-ghost btn-sm">
-                <span>ðŸ“Š</span> View All Receipts
+                <span>📊</span> View All Receipts
               </a>
             </div>
           </div>
         </section>
 
-        <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+        <!-- ══════════════════
              CHAT VIEW
-        â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+        ══════════════════ -->
         <section id="view-chat" class="view" aria-labelledby="chat-heading">
           <div class="chat-header">
-            <div class="chat-avatar" aria-hidden="true">ðŸ¤–</div>
+            <div class="chat-avatar" aria-hidden="true">🤖</div>
             <div class="chat-header-info">
               <h2 id="chat-heading">Expense Assistant</h2>
               <p>Ask anything about your spending history</p>
@@ -970,7 +970,7 @@
           <div class="chat-wrapper">
             <div class="chat-messages" id="chat-messages" aria-live="polite" aria-label="Chat messages">
               <div class="chat-empty" id="chat-empty">
-                <span class="chat-empty-icon" aria-hidden="true">ðŸ’¬</span>
+                <span class="chat-empty-icon" aria-hidden="true">💬</span>
                 <p class="chat-empty-title">Ask me anything about your expenses</p>
                 <p class="chat-empty-sub">Try: "What did I spend last week?" or "Which category costs the most?"</p>
               </div>
@@ -978,11 +978,11 @@
 
             <div class="chat-input-area">
               <textarea class="chat-input" id="chat-input" rows="1"
-                placeholder="Ask about your spendingâ€¦"
+                placeholder="Ask about your spending…"
                 aria-label="Chat message input"
                 onkeydown="handleChatKey(event)"></textarea>
               <button class="chat-send-btn" id="chat-send" onclick="sendMessage()" aria-label="Send message">
-                âž¤
+                ➤
               </button>
             </div>
           </div>
@@ -999,18 +999,18 @@
     const username = localStorage.getItem('username') || 'User';
     const email = localStorage.getItem('email') || '';
 
-    /* â”€â”€ Auth Guard â”€â”€ */
+    /* ── Auth Guard ── */
     if (!token) window.location.href = 'index.html';
 
-    /* â”€â”€ Init UI with user info â”€â”€ */
+    /* ── Init UI with user info ── */
     document.getElementById('avatar-initials').textContent = username.charAt(0).toUpperCase();
     document.getElementById('dd-username').textContent = username;
     document.getElementById('dd-email').textContent = email;
 
-    /* â”€â”€ Toast â”€â”€ */
+    /* ── Toast ── */
     function showToast(message, type = 'info') {
       const container = document.getElementById('toast-container');
-      const icons = { success: 'âœ…', error: 'âŒ', info: 'â„¹ï¸' };
+      const icons = { success: '✅', error: '❌', info: 'ℹ️' };
       const toast = document.createElement('div');
       toast.className = `toast toast-${type}`;
       toast.innerHTML = `<span class="toast-icon">${icons[type]}</span><span class="toast-message">${message}</span>`;
@@ -1021,7 +1021,7 @@
       }, 3500);
     }
 
-    /* â”€â”€ Auth fetch helper â”€â”€ */
+    /* ── Auth fetch helper ── */
     async function authFetch(url, options = {}) {
       const res = await fetch(url, {
         ...options,
@@ -1034,7 +1034,7 @@
       return res;
     }
 
-    /* â”€â”€ Sidebar toggle (desktop collapse) â”€â”€ */
+    /* ── Sidebar toggle (desktop collapse) ── */
     const sidebar = document.getElementById('sidebar');
     const sidebarToggle = document.getElementById('sidebar-toggle');
     let sidebarCollapsed = false;
@@ -1042,11 +1042,11 @@
     sidebarToggle.addEventListener('click', () => {
       sidebarCollapsed = !sidebarCollapsed;
       sidebar.classList.toggle('collapsed', sidebarCollapsed);
-      sidebarToggle.textContent = sidebarCollapsed ? 'â–¶' : 'â—€';
+      sidebarToggle.textContent = sidebarCollapsed ? '▶' : '◀';
       sidebarToggle.title = sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar';
     });
 
-    /* â”€â”€ Mobile Sidebar â”€â”€ */
+    /* ── Mobile Sidebar ── */
     const hamburgerBtn = document.getElementById('hamburger-btn');
     const sidebarOverlay = document.getElementById('sidebar-overlay');
 
@@ -1084,7 +1084,7 @@
       });
     });
 
-    /* â”€â”€ View switching â”€â”€ */
+    /* ── View switching ── */
     const viewTitles = { upload: 'Upload Receipt', chat: 'AI Chat' };
 
     function switchView(name) {
@@ -1097,7 +1097,7 @@
       if (window.innerWidth <= 640) closeMobileSidebar();
     }
 
-    /* â”€â”€ Profile dropdown â”€â”€ */
+    /* ── Profile dropdown ── */
     const avatarBtn = document.getElementById('avatar-btn');
     const dropdown = document.getElementById('dropdown');
 
@@ -1112,16 +1112,16 @@
       avatarBtn.setAttribute('aria-expanded', false);
     });
 
-    /* â”€â”€ Logout â”€â”€ */
+    /* ── Logout ── */
     document.getElementById('logout-btn').addEventListener('click', () => {
       localStorage.clear();
       showToast('Logged out successfully', 'info');
       setTimeout(() => window.location.href = 'index.html', 600);
     });
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    /* ════════════════════════════════════
        UPLOAD LOGIC
-    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    ════════════════════════════════════ */
     const dropZone = document.getElementById('drop-zone');
     const fileInput = document.getElementById('receipt-file');
 
@@ -1192,14 +1192,14 @@
         if (!res.ok) throw new Error(data.detail || 'Upload failed');
 
         // Populate result
-        document.getElementById('res-vendor').textContent = data.vendor || 'â€”';
-        document.getElementById('res-total').textContent = `₹${(data.total || 0).toFixed(2)}`;
-        document.getElementById('res-total-2').textContent = `₹${(data.total || 0).toFixed(2)}`;
-        document.getElementById('res-subtotal').textContent = `₹${(data.subtotal || 0).toFixed(2)}`;
-        document.getElementById('res-tax').textContent = `₹${(data.tax || 0).toFixed(2)}`;
-        document.getElementById('res-summary').textContent = data.summary || 'â€”';
+        document.getElementById('res-vendor').textContent = data.vendor || '—';
+        document.getElementById('res-total').textContent = `$${(data.total || 0).toFixed(2)}`;
+        document.getElementById('res-total-2').textContent = `$${(data.total || 0).toFixed(2)}`;
+        document.getElementById('res-subtotal').textContent = `$${(data.subtotal || 0).toFixed(2)}`;
+        document.getElementById('res-tax').textContent = `$${(data.tax || 0).toFixed(2)}`;
+        document.getElementById('res-summary').textContent = data.summary || '—';
 
-        const dateStr = data.date ? new Date(data.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'â€”';
+        const dateStr = data.date ? new Date(data.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '—';
         document.getElementById('res-date').textContent = dateStr;
 
         const cat = data.category || 'Other';
@@ -1225,9 +1225,9 @@
       }
     }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    /* ════════════════════════════════════
        CHAT LOGIC
-    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    ════════════════════════════════════ */
     let chatMessages = [];
 
     function handleChatKey(e) {
@@ -1248,7 +1248,7 @@
         `<th>${escapeHtml(String(k).replace(/_/g, ' '))}</th>`
       ).join('');
       const bodyRows = rows.map(row =>
-        `<tr>${keys.map(k => `<td>${escapeHtml(row[k] != null ? String(row[k]) : 'â€”')}</td>`).join('')}</tr>`
+        `<tr>${keys.map(k => `<td>${escapeHtml(row[k] != null ? String(row[k]) : '—')}</td>`).join('')}</tr>`
       ).join('');
       return `
         <div class="chat-table-wrap">
@@ -1273,7 +1273,7 @@
         try {
           const rows = typeof tableData === 'string' ? JSON.parse(tableData) : tableData;
           tableHTML = buildChatTable(rows);
-        } catch (_) { /* malformed table_data â€” skip silently */ }
+        } catch (_) { /* malformed table_data — skip silently */ }
       }
 
       const wrapper = document.createElement('div');
@@ -1348,7 +1348,7 @@
       }
     }
 
-    /* â”€â”€ Category badge helper â”€â”€ */
+    /* ── Category badge helper ── */
     function getCategoryBadge(cat) {
       const map = {
         'food': 'badge-amber',
@@ -1364,4 +1364,3 @@
   </script>
 </body>
 </html>
-

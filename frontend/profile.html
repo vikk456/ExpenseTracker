@@ -3,18 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ExpenseTracker â€” My Receipts</title>
+  <title>ExpenseTracker — My Receipts</title>
   <meta name="description" content="View all your past receipts, spending analytics, and AI-extracted expense details." />
   <link rel="stylesheet" href="styles.css" />
   <style>
-    /* â”€â”€ Page layout â”€â”€ */
+    /* ── Page layout ── */
     .profile-page {
       min-height: 100vh;
       position: relative;
       z-index: 1;
     }
 
-    /* â”€â”€ Top Bar â”€â”€ */
+    /* ── Top Bar ── */
     .topbar {
       display: flex;
       align-items: center;
@@ -74,7 +74,7 @@
 
     .topbar-right { display: flex; align-items: center; gap: 14px; }
 
-    /* â”€â”€ Avatar / dropdown (same as app.html) â”€â”€ */
+    /* ── Avatar / dropdown (same as app.html) ── */
     .profile-menu { position: relative; }
     .avatar-btn {
       width: 40px; height: 40px; border-radius: 50%;
@@ -106,15 +106,15 @@
     .dropdown-item.danger { color: #f87171; }
     .dropdown-item.danger:hover { background: rgba(239,68,68,0.1); }
 
-    /* â”€â”€ Page content â”€â”€ */
+    /* ── Page content ── */
     .page-content { padding: 36px; max-width: 1400px; margin: 0 auto; }
 
-    /* â”€â”€ Page header â”€â”€ */
+    /* ── Page header ── */
     .page-header { margin-bottom: 32px; }
     .page-title { font-size: 30px; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 6px; }
     .page-subtitle { font-size: 14px; color: var(--text-secondary); }
 
-    /* â”€â”€ Analytics Strip â”€â”€ */
+    /* ── Analytics Strip ── */
     .analytics-strip {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -156,7 +156,7 @@
 
     .stat-sub { font-size: 12px; color: var(--text-muted); }
 
-    /* â”€â”€ Section separator â”€â”€ */
+    /* ── Section separator ── */
     .section-title {
       font-size: 16px;
       font-weight: 700;
@@ -176,14 +176,14 @@
       font-weight: 600;
     }
 
-    /* â”€â”€ Expense Grid â”€â”€ */
+    /* ── Expense Grid ── */
     .expense-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
       gap: 18px;
     }
 
-    /* â”€â”€ Expense Card â”€â”€ */
+    /* ── Expense Card ── */
     .expense-card {
       padding: 22px;
       cursor: pointer;
@@ -239,7 +239,7 @@
 
     .expense-card:hover .ec-expand-hint { color: var(--accent-secondary); }
 
-    /* â”€â”€ Expanded Card / Modal â”€â”€ */
+    /* ── Expanded Card / Modal ── */
     .modal-backdrop {
       position: fixed;
       inset: 0;
@@ -317,7 +317,7 @@
     .modal-receipt-img { width: 100%; border-radius: var(--radius-md); object-fit: contain; max-height: 450px; border: 1px solid var(--glass-border); }
     .no-receipt { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 200px; gap: 10px; color: var(--text-muted); font-size: 14px; }
 
-    /* â”€â”€ Loading / Empty states â”€â”€ */
+    /* ── Loading / Empty states ── */
     .loading-state {
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       gap: 16px; padding: 80px 20px; text-align: center; color: var(--text-secondary);
@@ -332,7 +332,7 @@
     .empty-title { font-size: 20px; font-weight: 700; color: var(--text-secondary); }
     .empty-sub { font-size: 14px; color: var(--text-muted); max-width: 300px; }
 
-    /* â”€â”€ Responsive â”€â”€ */
+    /* ── Responsive ── */
     @media (max-width: 768px) {
       .page-content { padding: 20px; }
       .topbar { padding: 12px 20px; }
@@ -357,12 +357,12 @@
     <div class="modal glass-card" id="modal">
       <div class="modal-header">
         <div>
-          <p class="modal-vendor" id="modal-vendor">â€”</p>
+          <p class="modal-vendor" id="modal-vendor">—</p>
           <div id="modal-category-badge" style="margin-top: 8px;"></div>
         </div>
         <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 10px;">
-          <p class="modal-total" id="modal-total">₹0.00</p>
-          <button class="modal-close" id="modal-close" aria-label="Close modal">âœ•</button>
+          <p class="modal-total" id="modal-total">$0.00</p>
+          <button class="modal-close" id="modal-close" aria-label="Close modal">✕</button>
         </div>
       </div>
 
@@ -370,34 +370,34 @@
         <!-- Details -->
         <div class="modal-details">
           <div class="modal-meta-row">
-            <span class="modal-meta-label">ðŸ“… Date</span>
-            <span class="modal-meta-value" id="modal-date">â€”</span>
+            <span class="modal-meta-label">📅 Date</span>
+            <span class="modal-meta-value" id="modal-date">—</span>
           </div>
           <div class="modal-meta-row">
-            <span class="modal-meta-label">ðŸ§¾ Subtotal</span>
-            <span class="modal-meta-value" id="modal-subtotal">â€”</span>
+            <span class="modal-meta-label">🧾 Subtotal</span>
+            <span class="modal-meta-value" id="modal-subtotal">—</span>
           </div>
           <div class="modal-meta-row">
-            <span class="modal-meta-label">ðŸ’¸ Tax</span>
-            <span class="modal-meta-value" id="modal-tax">â€”</span>
+            <span class="modal-meta-label">💸 Tax</span>
+            <span class="modal-meta-value" id="modal-tax">—</span>
           </div>
           <div class="modal-meta-row">
-            <span class="modal-meta-label">ðŸ’° Total</span>
-            <span class="modal-meta-value" id="modal-total-2" style="color: var(--accent-secondary); font-size: 16px;">â€”</span>
+            <span class="modal-meta-label">💰 Total</span>
+            <span class="modal-meta-value" id="modal-total-2" style="color: var(--accent-secondary); font-size: 16px;">—</span>
           </div>
 
           <div>
             <p class="modal-summary-label">AI Summary</p>
-            <p class="modal-summary-text" id="modal-summary">â€”</p>
+            <p class="modal-summary-text" id="modal-summary">—</p>
           </div>
         </div>
 
         <!-- Receipt image -->
         <div class="modal-receipt-section">
-          <p class="modal-receipt-label">ðŸ“¸ Receipt</p>
+          <p class="modal-receipt-label">📸 Receipt</p>
           <img id="modal-receipt-img" class="modal-receipt-img hidden" alt="Receipt image" />
           <div id="modal-no-receipt" class="no-receipt">
-            <span style="font-size: 48px; opacity: 0.3;">ðŸ§¾</span>
+            <span style="font-size: 48px; opacity: 0.3;">🧾</span>
             <span>No receipt image available</span>
           </div>
         </div>
@@ -410,10 +410,10 @@
     <header class="topbar">
       <div class="topbar-left">
         <a href="app.html" class="back-btn" aria-label="Back to dashboard">
-          â† Dashboard
+          ← Dashboard
         </a>
         <div class="topbar-brand">
-          <div class="topbar-brand-icon" aria-hidden="true">ðŸ’¸</div>
+          <div class="topbar-brand-icon" aria-hidden="true">💸</div>
           <span>ExpenseTracker</span>
         </div>
       </div>
@@ -425,14 +425,14 @@
           </button>
           <div class="dropdown" id="dropdown" role="menu">
             <div class="dropdown-header">
-              <div class="dropdown-username" id="dd-username">â€”</div>
+              <div class="dropdown-username" id="dd-username">—</div>
               <div class="dropdown-email" id="dd-email"></div>
             </div>
             <a href="app.html" class="dropdown-item" role="menuitem">
-              <span aria-hidden="true">ðŸ </span> Dashboard
+              <span aria-hidden="true">🏠</span> Dashboard
             </a>
             <button class="dropdown-item danger" id="logout-btn" role="menuitem">
-              <span aria-hidden="true">ðŸšª</span> Logout
+              <span aria-hidden="true">🚪</span> Logout
             </button>
           </div>
         </div>
@@ -450,27 +450,27 @@
       <section aria-label="Spending analytics">
         <div class="analytics-strip" id="analytics-strip">
           <div class="glass-card stat-card">
-            <span class="stat-icon">ðŸ’°</span>
+            <span class="stat-icon">💰</span>
             <span class="stat-label">Total Spent</span>
-            <span class="stat-value gradient" id="stat-total">â€”</span>
+            <span class="stat-value gradient" id="stat-total">—</span>
             <span class="stat-sub">Across all receipts</span>
           </div>
           <div class="glass-card stat-card">
-            <span class="stat-icon">ðŸ§¾</span>
+            <span class="stat-icon">🧾</span>
             <span class="stat-label">Receipts</span>
-            <span class="stat-value cyan" id="stat-count">â€”</span>
+            <span class="stat-value cyan" id="stat-count">—</span>
             <span class="stat-sub">Total uploaded</span>
           </div>
           <div class="glass-card stat-card">
-            <span class="stat-icon">ðŸ†</span>
+            <span class="stat-icon">🏆</span>
             <span class="stat-label">Top Category</span>
-            <span class="stat-value emerald" id="stat-top-cat" style="font-size: 20px;">â€”</span>
+            <span class="stat-value emerald" id="stat-top-cat" style="font-size: 20px;">—</span>
             <span class="stat-sub">By total spend</span>
           </div>
           <div class="glass-card stat-card">
-            <span class="stat-icon">ðŸ“Š</span>
+            <span class="stat-icon">📊</span>
             <span class="stat-label">Avg per Receipt</span>
-            <span class="stat-value amber" id="stat-avg">â€”</span>
+            <span class="stat-value amber" id="stat-avg">—</span>
             <span class="stat-sub">Average spend</span>
           </div>
         </div>
@@ -486,12 +486,12 @@
         <!-- Loading -->
         <div id="loading-state" class="loading-state" role="status" aria-live="polite">
           <div class="spinner" style="width: 36px; height: 36px; border-width: 3px;" aria-hidden="true"></div>
-          <p>Loading your receiptsâ€¦</p>
+          <p>Loading your receipts…</p>
         </div>
 
         <!-- Empty -->
         <div id="empty-state" class="empty-state hidden">
-          <span class="empty-icon" aria-hidden="true">ðŸ§¾</span>
+          <span class="empty-icon" aria-hidden="true">🧾</span>
           <p class="empty-title">No receipts yet</p>
           <p class="empty-sub">Upload your first receipt to start tracking your expenses with AI</p>
           <a href="app.html" class="btn btn-primary" style="margin-top: 8px;">Upload a Receipt</a>
@@ -509,18 +509,18 @@
     const username = localStorage.getItem('username') || 'User';
     const email = localStorage.getItem('email') || '';
 
-    /* â”€â”€ Auth Guard â”€â”€ */
+    /* ── Auth Guard ── */
     if (!token) window.location.href = 'index.html';
 
-    /* â”€â”€ User info â”€â”€ */
+    /* ── User info ── */
     document.getElementById('avatar-initials').textContent = username.charAt(0).toUpperCase();
     document.getElementById('dd-username').textContent = username;
     document.getElementById('dd-email').textContent = email;
 
-    /* â”€â”€ Toast â”€â”€ */
+    /* ── Toast ── */
     function showToast(message, type = 'info') {
       const container = document.getElementById('toast-container');
-      const icons = { success: 'âœ…', error: 'âŒ', info: 'â„¹ï¸' };
+      const icons = { success: '✅', error: '❌', info: 'ℹ️' };
       const toast = document.createElement('div');
       toast.className = `toast toast-${type}`;
       toast.innerHTML = `<span class="toast-icon">${icons[type]}</span><span class="toast-message">${message}</span>`;
@@ -531,7 +531,7 @@
       }, 3500);
     }
 
-    /* â”€â”€ Profile dropdown â”€â”€ */
+    /* ── Profile dropdown ── */
     const avatarBtn = document.getElementById('avatar-btn');
     const dropdown = document.getElementById('dropdown');
 
@@ -551,7 +551,7 @@
       window.location.href = 'index.html';
     });
 
-    /* â”€â”€ Category badge helper â”€â”€ */
+    /* ── Category badge helper ── */
     function getCategoryBadge(cat) {
       const map = {
         'food': 'badge-amber',
@@ -565,11 +565,11 @@
     }
 
     function formatDate(d) {
-      if (!d) return 'â€”';
+      if (!d) return '—';
       return new Date(d).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
     }
 
-    /* â”€â”€ Analytics â”€â”€ */
+    /* ── Analytics ── */
     function computeAnalytics(expenses) {
       const total = expenses.reduce((s, e) => s + (e.total || 0), 0);
       const count = expenses.length;
@@ -583,15 +583,15 @@
       });
       const topCat = Object.entries(catMap).sort((a,b) => b[1]-a[1])[0];
 
-      document.getElementById('stat-total').textContent = `₹${total.toFixed(2)}`;
+      document.getElementById('stat-total').textContent = `$${total.toFixed(2)}`;
       document.getElementById('stat-count').textContent = count;
-      document.getElementById('stat-top-cat').textContent = topCat ? capitalize(topCat[0]) : 'â€”';
-      document.getElementById('stat-avg').textContent = count ? `₹${avg.toFixed(2)}` : 'â€”';
+      document.getElementById('stat-top-cat').textContent = topCat ? capitalize(topCat[0]) : '—';
+      document.getElementById('stat-avg').textContent = count ? `$${avg.toFixed(2)}` : '—';
     }
 
     function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
-    /* â”€â”€ Render grid â”€â”€ */
+    /* ── Render grid ── */
     function renderExpenses(expenses) {
       const grid = document.getElementById('expense-grid');
       const countLabel = document.getElementById('count-label');
@@ -619,7 +619,7 @@
         card.innerHTML = `
           <div class="ec-top">
             <div>
-              <p class="ec-vendor">${escapeHtml(exp.vendor || 'â€”')}</p>
+              <p class="ec-vendor">${escapeHtml(exp.vendor || '—')}</p>
               <div style="margin-top: 8px;">
                 <span class="badge ${badge}">${exp.category || 'Other'}</span>
               </div>
@@ -627,8 +627,8 @@
             <p class="ec-total">$${(exp.total || 0).toFixed(2)}</p>
           </div>
           <div class="ec-meta">
-            <span class="ec-date">ðŸ“… ${formatDate(exp.date)}</span>
-            <span class="ec-expand-hint">ðŸ“Ž View details â†’</span>
+            <span class="ec-date">📅 ${formatDate(exp.date)}</span>
+            <span class="ec-expand-hint">📎 View details →</span>
           </div>`;
 
         card.addEventListener('click', () => openModal(exp));
@@ -644,15 +644,15 @@
       });
     }
 
-    /* â”€â”€ Modal â”€â”€ */
+    /* ── Modal ── */
     function openModal(exp) {
       const backdrop = document.getElementById('modal-backdrop');
 
-      document.getElementById('modal-vendor').textContent = exp.vendor || 'â€”';
-      document.getElementById('modal-total').textContent = `₹${(exp.total || 0).toFixed(2)}`;
-      document.getElementById('modal-total-2').textContent = `₹${(exp.total || 0).toFixed(2)}`;
-      document.getElementById('modal-subtotal').textContent = `₹${(exp.subtotal || 0).toFixed(2)}`;
-      document.getElementById('modal-tax').textContent = `₹${(exp.tax || 0).toFixed(2)}`;
+      document.getElementById('modal-vendor').textContent = exp.vendor || '—';
+      document.getElementById('modal-total').textContent = `$${(exp.total || 0).toFixed(2)}`;
+      document.getElementById('modal-total-2').textContent = `$${(exp.total || 0).toFixed(2)}`;
+      document.getElementById('modal-subtotal').textContent = `$${(exp.subtotal || 0).toFixed(2)}`;
+      document.getElementById('modal-tax').textContent = `$${(exp.tax || 0).toFixed(2)}`;
       document.getElementById('modal-date').textContent = formatDate(exp.date);
       document.getElementById('modal-summary').textContent = exp.summary || 'No summary available.';
 
@@ -689,7 +689,7 @@
     });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
 
-    /* â”€â”€ Fetch profile data â”€â”€ */
+    /* ── Fetch profile data ── */
     async function loadProfile() {
       try {
         const res = await fetch(`${API}/profile`, {
@@ -720,7 +720,7 @@
       return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     }
 
-    /* â”€â”€ Card animation â”€â”€ */
+    /* ── Card animation ── */
     const styleEl = document.createElement('style');
     styleEl.textContent = `
       @keyframes cardIn {
@@ -730,9 +730,8 @@
     `;
     document.head.appendChild(styleEl);
 
-    /* â”€â”€ Init â”€â”€ */
+    /* ── Init ── */
     loadProfile();
   </script>
 </body>
 </html>
-
