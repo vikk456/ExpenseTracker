@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -361,7 +361,7 @@
           <div id="modal-category-badge" style="margin-top: 8px;"></div>
         </div>
         <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 10px;">
-          <p class="modal-total" id="modal-total">$0.00</p>
+          <p class="modal-total" id="modal-total">₹0.00</p>
           <button class="modal-close" id="modal-close" aria-label="Close modal">✕</button>
         </div>
       </div>
@@ -583,10 +583,10 @@
       });
       const topCat = Object.entries(catMap).sort((a,b) => b[1]-a[1])[0];
 
-      document.getElementById('stat-total').textContent = `$${total.toFixed(2)}`;
+      document.getElementById('stat-total').textContent = `₹${total.toFixed(2)}`;
       document.getElementById('stat-count').textContent = count;
       document.getElementById('stat-top-cat').textContent = topCat ? capitalize(topCat[0]) : '—';
-      document.getElementById('stat-avg').textContent = count ? `$${avg.toFixed(2)}` : '—';
+      document.getElementById('stat-avg').textContent = count ? `₹${avg.toFixed(2)}` : '—';
     }
 
     function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
@@ -624,7 +624,7 @@
                 <span class="badge ${badge}">${exp.category || 'Other'}</span>
               </div>
             </div>
-            <p class="ec-total">$${(exp.total || 0).toFixed(2)}</p>
+            <p class="ec-total">₹${(exp.total || 0).toFixed(2)}</p>
           </div>
           <div class="ec-meta">
             <span class="ec-date">📅 ${formatDate(exp.date)}</span>
@@ -649,10 +649,10 @@
       const backdrop = document.getElementById('modal-backdrop');
 
       document.getElementById('modal-vendor').textContent = exp.vendor || '—';
-      document.getElementById('modal-total').textContent = `$${(exp.total || 0).toFixed(2)}`;
-      document.getElementById('modal-total-2').textContent = `$${(exp.total || 0).toFixed(2)}`;
-      document.getElementById('modal-subtotal').textContent = `$${(exp.subtotal || 0).toFixed(2)}`;
-      document.getElementById('modal-tax').textContent = `$${(exp.tax || 0).toFixed(2)}`;
+      document.getElementById('modal-total').textContent = `₹${(exp.total || 0).toFixed(2)}`;
+      document.getElementById('modal-total-2').textContent = `₹${(exp.total || 0).toFixed(2)}`;
+      document.getElementById('modal-subtotal').textContent = `₹${(exp.subtotal || 0).toFixed(2)}`;
+      document.getElementById('modal-tax').textContent = `₹${(exp.tax || 0).toFixed(2)}`;
       document.getElementById('modal-date').textContent = formatDate(exp.date);
       document.getElementById('modal-summary').textContent = exp.summary || 'No summary available.';
 

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -905,7 +905,7 @@
                     <p class="expense-vendor" id="res-vendor">—</p>
                     <div id="res-category-badge" style="margin-top: 8px;"></div>
                   </div>
-                  <p class="expense-total" id="res-total">$0.00</p>
+                  <p class="expense-total" id="res-total">₹0.00</p>
                 </div>
 
                 <div class="expense-meta">
@@ -1193,10 +1193,10 @@
 
         // Populate result
         document.getElementById('res-vendor').textContent = data.vendor || '—';
-        document.getElementById('res-total').textContent = `$${(data.total || 0).toFixed(2)}`;
-        document.getElementById('res-total-2').textContent = `$${(data.total || 0).toFixed(2)}`;
-        document.getElementById('res-subtotal').textContent = `$${(data.subtotal || 0).toFixed(2)}`;
-        document.getElementById('res-tax').textContent = `$${(data.tax || 0).toFixed(2)}`;
+        document.getElementById('res-total').textContent = `₹${(data.total || 0).toFixed(2)}`;
+        document.getElementById('res-total-2').textContent = `₹${(data.total || 0).toFixed(2)}`;
+        document.getElementById('res-subtotal').textContent = `₹${(data.subtotal || 0).toFixed(2)}`;
+        document.getElementById('res-tax').textContent = `₹${(data.tax || 0).toFixed(2)}`;
         document.getElementById('res-summary').textContent = data.summary || '—';
 
         const dateStr = data.date ? new Date(data.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '—';
